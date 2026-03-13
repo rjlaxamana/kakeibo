@@ -1,206 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Kakeibo">
-<title>Kakeibo</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg:#0a0a0b; --sf:#111113; --sf2:#17171a; --sf3:#1e1e23;
-  --bd:#222228; --bds:#18181c;
-  --jpy:#e8a0b4; --jpyd:rgba(232,160,180,.10);
-  --php:#6ab4d4; --phpd:rgba(106,180,212,.10);
-  --exp:#e07878; --expd:rgba(224,120,120,.12);
-  --inc:#7ec8a0; --incd:rgba(126,200,160,.12);
-  --fix:#b4a0e8; --fixd:rgba(180,160,232,.10);
-  --accent:var(--exp); --accentd:var(--expd);
-  --t:#e4e4ea; --t2:#72728a; --t3:#38383f;
-  --r:14px; --rs:10px; --th:68px;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--t);font-family:'Nunito',sans-serif;font-weight:400;max-width:430px;margin:0 auto}
-
-/* SCREENS */
-.scr{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;bottom:var(--th);overflow-y:auto;overflow-x:hidden;display:none;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.scr::-webkit-scrollbar{display:none}
-.scr.on{display:block}
-
-/* TABS */
-.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:var(--th);background:var(--sf);border-top:1px solid var(--bd);display:grid;grid-template-columns:repeat(3,1fr);z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
-.tb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;cursor:pointer;padding:8px 4px}
-.ti{font-size:19px;opacity:.28;transition:opacity .2s}
-.tl{font-size:9px;color:var(--t2);letter-spacing:.5px;text-transform:uppercase;font-weight:600;transition:color .2s}
-.tb.on .ti{opacity:1}
-.tb.on .tl{color:var(--jpy)}
-
-/* PAGE HEADER */
-.ph{padding:52px 24px 14px;display:flex;align-items:flex-end;justify-content:space-between}
-.pht{font-family:'Plus Jakarta Sans',sans-serif;font-size:30px;font-weight:700;letter-spacing:-.5px;line-height:1}
-.pht em{color:var(--jpy);font-style:normal}
-.ibtn{width:34px;height:34px;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--t2);flex-shrink:0}
-
-/* TOGGLES ROW */
-.tog-row{margin:0 24px 16px;display:flex;align-items:center;gap:10px;justify-content:space-between}
-.ctog{display:flex;background:var(--sf2);border-radius:100px;padding:3px;border:1px solid var(--bd)}
-.cbtn{padding:7px 16px;border:none;background:transparent;border-radius:100px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:var(--t2);transition:all .2s;display:flex;align-items:center;gap:5px}
-.cbtn.aj{background:var(--jpy);color:#0a0a0b}
-.cbtn.ap{background:var(--php);color:#0a0a0b}
-.ttog{display:flex;background:var(--sf2);border-radius:100px;padding:3px;border:1px solid var(--bd)}
-.ttbtn{padding:7px 14px;border:none;background:transparent;border-radius:100px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:var(--t2);transition:all .2s;white-space:nowrap}
-.ttbtn.ae{background:var(--exp);color:#fff}
-.ttbtn.ai{background:var(--inc);color:#0a0a0b}
-
-/* AMOUNT CARD */
-.acard{margin:0 24px 16px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r);padding:18px 20px;transition:border-color .3s}
-.acard:focus-within{border-color:var(--accent)}
-.arow{display:flex;align-items:center;gap:8px}
-.asym{font-family:'Plus Jakarta Sans',sans-serif;font-size:34px;font-weight:700;color:var(--accent);line-height:1;min-width:22px;transition:color .2s}
-.ainp{flex:1;background:transparent;border:none;outline:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:46px;font-weight:700;color:var(--t);caret-color:var(--accent);width:100%;line-height:1}
-.ainp::placeholder{color:var(--t3)}
-
-/* PILL SECTION */
-.pw{margin:0 24px 16px}
-.sl{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:9px;font-weight:700}
-.pscroll{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
-.pscroll::-webkit-scrollbar{display:none}
-.pill{display:flex;align-items:center;gap:5px;padding:7px 13px;background:var(--sf2);border:1px solid var(--bd);border-radius:100px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
-.pill span:first-child{font-size:14px}
-.pill span:last-child{font-size:11px;color:var(--t2);font-weight:600}
-.pill.on{background:var(--accentd);border-color:var(--accent)}
-.pill.on span:last-child{color:var(--accent)}
-
-/* NOTE + SUBMIT */
-.fw{margin:0 24px 16px}
-.ninp{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rs);padding:12px 15px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:400;color:var(--t);outline:none;transition:border-color .2s;resize:none;height:46px}
-.ninp::placeholder{color:var(--t2)}
-.ninp:focus{border-color:var(--accent)}
-.bw{margin:0 24px 22px}
-.btn{width:100%;padding:15px;background:var(--exp);color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:background .2s,opacity .2s}
-.btn.inc{background:var(--inc);color:#0a0a0b}
-.btn:active{opacity:.85}
-.btn:disabled{opacity:.35;cursor:not-allowed}
-
-/* DIVIDER */
-.dv{margin:0 24px 16px;display:flex;align-items:center;gap:12px}
-.dl{flex:1;height:1px;background:var(--bd)}
-.dt{font-size:10px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;font-weight:700}
-
-/* LIST */
-.lw{margin:0 24px 32px;display:flex;flex-direction:column;gap:5px}
-.li{display:flex;align-items:center;gap:10px;padding:12px 13px;background:var(--sf);border:1px solid var(--bds);border-radius:var(--rs);animation:fu .2s ease}
-@keyframes fu{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.lic{width:32px;height:32px;background:var(--sf2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.lim{flex:1;min-width:0}
-.lit{font-size:13px;font-weight:600;color:var(--t)}
-.lis{font-size:11px;color:var(--t2);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lir{text-align:right;flex-shrink:0}
-.lia{font-size:14px;font-weight:700}
-.lia.e{color:var(--exp)}
-.lia.i{color:var(--inc)}
-.litime{font-size:10px;color:var(--t3);margin-top:2px}
-.empty{text-align:center;padding:32px 0;color:var(--t3)}
-.ei{font-size:26px;margin-bottom:6px;opacity:.35}
-.et{font-size:12px;font-weight:500}
-
-/* SETUP BANNER */
-.sbanner{margin:0 24px 14px;padding:11px 14px;background:var(--jpyd);border:1px solid rgba(232,160,180,.2);border-radius:var(--rs);font-size:12px;font-weight:600;color:var(--jpy);cursor:pointer;display:none;align-items:center;gap:8px}
-
-/* CALENDAR */
-.cnav{margin:0 24px 12px;display:flex;align-items:center;justify-content:space-between}
-.cml{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:700}
-.carr{width:30px;height:30px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:16px}
-.cgrid{margin:0 24px 14px}
-.cdow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px}
-.cdow span{text-align:center;font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;padding:4px 0;font-weight:700}
-.cdays{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.cday{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;position:relative;transition:background .15s}
-.cday:active{background:var(--sf2)}
-.cday.other{opacity:.3}
-.cday.today{background:var(--sf2)}
-.cday.today .cdn{color:var(--jpy);font-weight:800}
-.cday.sel{background:var(--jpyd);border:1px solid var(--jpy)}
-.cdn{font-size:12px;color:var(--t2);line-height:1;font-weight:600}
-.cdot{width:4px;height:4px;border-radius:50%;position:absolute;bottom:3px}
-.cdot.e{background:var(--exp)}
-.cdot.i{background:var(--inc);right:6px}
-.csum{margin:0 24px 16px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
-.csumh{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
-.csumd{font-size:13px;font-weight:700}
-.csumt{font-size:13px;font-weight:700;color:var(--exp)}
-.csumt.pos{color:var(--inc)}
-.csuml{padding:6px 8px}
-.crow{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px}
-.cri{font-size:13px;width:22px;text-align:center}
-.crn{flex:1;font-size:12px;color:var(--t2);font-weight:500}
-.cra{font-size:12px;font-weight:700}
-
-/* ACCOUNTS */
-.aw{padding:0 24px 32px}
-.nwcard{background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r);padding:18px 20px;margin-bottom:16px;position:relative;overflow:hidden}
-.nwcard::after{content:'';position:absolute;top:-40px;right:-40px;width:130px;height:130px;background:radial-gradient(circle,var(--jpyd) 0%,transparent 70%);pointer-events:none}
-.nwl{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:5px;font-weight:700}
-.nwa{font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:700;line-height:1}
-.nwsubs{display:flex;gap:16px;margin-top:10px}
-.nwsv{font-size:14px;font-weight:700}
-.nwsv.gi{color:var(--inc)}
-.nwsv.ge{color:var(--exp)}
-.nwsl{font-size:10px;color:var(--t3);margin-top:1px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
-.ast{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:9px;font-weight:700}
-.alist{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
-.acard2{display:flex;align-items:center;gap:10px;padding:13px 14px;background:var(--sf);border:1px solid var(--bds);border-radius:var(--rs);cursor:pointer;transition:border-color .2s}
-.acard2:active{border-color:var(--jpy)}
-.aico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-.aico.bk{background:var(--jpyd)}
-.aico.cc{background:var(--phpd)}
-.aico.cs{background:var(--incd)}
-.ainf{flex:1}
-.an{font-size:13px;font-weight:700}
-.as2{font-size:11px;color:var(--t2);margin-top:1px;font-weight:500}
-.ar{text-align:right;flex-shrink:0}
-.ab{font-size:14px;font-weight:700}
-.ab.jpy{color:var(--jpy)}
-.ab.php{color:var(--php)}
-.atl{font-size:9px;color:var(--t3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
-.addbtn{width:100%;padding:12px;background:transparent;border:1px dashed var(--bd);border-radius:var(--rs);color:var(--t2);font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s}
-.addbtn:hover{border-color:var(--jpy);color:var(--jpy)}
-
-/* OVERLAY/SHEET */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
-.overlay.on{opacity:1;pointer-events:all}
-.sheet{position:absolute;bottom:0;left:0;right:0;background:var(--sf);border-radius:22px 22px 0 0;border-top:1px solid var(--bd);padding:18px 24px 44px;transform:translateY(100%);transition:transform .38s cubic-bezier(.32,.72,0,1);max-height:90vh;overflow-y:auto;scrollbar-width:none}
-.sheet::-webkit-scrollbar{display:none}
-.overlay.on .sheet{transform:translateY(0)}
-.shh{width:34px;height:4px;background:var(--bd);border-radius:2px;margin:0 auto 18px}
-.sht{font-family:'Plus Jakarta Sans',sans-serif;font-size:24px;font-weight:700;margin-bottom:16px}
-.shf{margin-bottom:13px}
-.shf label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:7px;font-weight:700}
-.shf input,.shf select{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rs);padding:11px 13px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:400;color:var(--t);outline:none;transition:border-color .2s}
-.shf input:focus,.shf select:focus{border-color:var(--jpy)}
-.shf input option,.shf select option{background:var(--sf2)}
-.shhint{font-size:11px;color:var(--t2);margin-top:4px;line-height:1.5;font-weight:500}
-.shbtn{width:100%;padding:14px;background:var(--jpy);color:#0a0a0b;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:opacity .2s;margin-top:4px}
-.shbtn:active{opacity:.85}
-.shgho{width:100%;padding:12px;background:transparent;color:var(--t2);border:1px solid var(--bd);border-radius:var(--rs);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
-.shdan{width:100%;padding:12px;background:transparent;color:var(--exp);border:1px solid var(--exp);border-radius:var(--rs);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
-#testResult{margin-top:12px;font-size:12px;line-height:1.6;color:var(--t2);display:none;background:var(--sf2);padding:12px;border-radius:8px;word-break:break-all;white-space:pre-wrap;font-weight:500}
-.crbar{background:var(--sf2);border-radius:var(--rs);padding:13px;margin-bottom:13px}
-.crt{height:5px;background:var(--sf3);border-radius:3px;margin:8px 0}
-.crf{height:100%;border-radius:3px;background:var(--jpy);transition:width .5s}
-.crls{display:flex;justify-content:space-between;font-size:11px;color:var(--t2);font-weight:600}
-.prop-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--bds)}
-.prop-row:last-child{border-bottom:none}
-
-/* TOAST */
-.toast{position:fixed;bottom:calc(var(--th)+14px);left:50%;transform:translateX(-50%) translateY(14px);background:var(--sf2);border:1px solid var(--bd);padding:9px 18px;border-radius:100px;font-size:13px;font-weight:600;color:var(--t);transition:all .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;z-index:300;opacity:0;pointer-events:none}
-.toast.on{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.err{border-color:var(--exp);color:var(--exp)}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>家計簿+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700&display=swap">
+  <link rel="stylesheet" href="kakeibo.css">
 </head>
 <body>
 
@@ -210,9 +18,7 @@ body{background:var(--bg);color:var(--t);font-family:'Nunito',sans-serif;font-we
     <div class="pht">家計<em>簿</em></div>
     <div class="ibtn" onclick="oSheet('sh-cfg')">⚙</div>
   </div>
-
   <div class="sbanner" id="setupBanner" onclick="oSheet('sh-cfg')">🔗 Connect Notion to sync →</div>
-
   <div class="tog-row">
     <div class="ctog">
       <button class="cbtn aj" id="bjpy" onclick="setCur('JPY')">🇯🇵 JPY</button>
@@ -223,28 +29,23 @@ body{background:var(--bg);color:var(--t);font-family:'Nunito',sans-serif;font-we
       <button class="ttbtn" id="btn-inc" onclick="setMode('income')">+ Inc</button>
     </div>
   </div>
-
   <div class="acard">
     <div class="arow">
       <div class="asym" id="aSym">¥</div>
       <input class="ainp" id="aInp" type="number" inputmode="decimal" placeholder="0">
     </div>
   </div>
-
   <div class="pw">
     <div class="sl" id="pillLabel">Category</div>
     <div class="pscroll" id="pillScroll"></div>
   </div>
-
   <div class="fw">
     <div class="sl">Note <span style="color:var(--t3);font-size:9px;font-weight:400">(optional)</span></div>
     <textarea class="ninp" id="nInp" placeholder="What was this for?"></textarea>
   </div>
-
   <div class="bw">
     <button class="btn" id="subBtn" onclick="subMain()">Log Expense</button>
   </div>
-
   <div class="dv"><div class="dl"></div><div class="dt">Recent</div><div class="dl"></div></div>
   <div class="lw" id="recList"></div>
 </div>
@@ -294,6 +95,24 @@ body{background:var(--bg);color:var(--t);font-family:'Nunito',sans-serif;font-we
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- EDIT DATE SHEET -->
+<div class="overlay" id="sh-edit-date" onclick="overlayClick(event,'sh-edit-date')">
+  <div class="sheet">
+    <div class="shh"></div>
+    <div class="sht">Edit Date</div>
+    <div class="cnav" style="margin:0 0 12px">
+      <div class="carr" onclick="edCalPrev()">‹</div>
+      <div class="cml" id="edCalLabel" style="font-size:16px"></div>
+      <div class="carr" onclick="edCalNext()">›</div>
+    </div>
+    <div class="cgrid" style="margin:0 0 14px">
+      <div class="cdow"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+      <div class="cdays" id="edCalDays"></div>
+    </div>
+    <button class="shbtn" onclick="saveEditDate()">Save</button>
+  </div>
+</div>
+
 <!-- SETTINGS SHEET -->
 <div class="overlay" id="sh-cfg" onclick="overlayClick(event,'sh-cfg')">
   <div class="sheet">
@@ -337,7 +156,7 @@ body{background:var(--bg);color:var(--t);font-family:'Nunito',sans-serif;font-we
     <div class="shh"></div>
     <div class="sht">Add Account</div>
     <div class="shf"><label>Account Name</label><input id="acN" placeholder="e.g. Rakuten Bank, BPI"></div>
-    <div class="shf"><label>Type</label><select id="acT" onchange="toggleCF()"><option value="Bank">Bank Account</option><option value="Credit">Credit Card</option><option value="Cash">Cash / Wallet</option></select></div>
+    <div class="shf"><label>Type</label><select id="acT" onchange="toggleCF()"><option value="bank">Bank Account</option><option value="credit">Credit Card</option><option value="cash">Cash / Wallet</option></select></div>
     <div class="shf"><label>Currency</label><select id="acC"><option value="JPY">🇯🇵 JPY</option><option value="PHP">🇵🇭 PHP</option></select></div>
     <div class="shf"><label id="acBL">Current Balance</label><input id="acB" type="number" inputmode="decimal" placeholder="0"></div>
     <div class="shf" id="acLF" style="display:none"><label>Credit Limit</label><input id="acL" type="number" inputmode="decimal" placeholder="0"></div>
@@ -357,535 +176,13 @@ body{background:var(--bg);color:var(--t);font-family:'Nunito',sans-serif;font-we
       <div class="crls"><span id="crUsed">Used: ¥0</span><span id="crLim">Limit: ¥0</span></div>
     </div>
     <div class="shf"><label id="upBL">New Balance</label><input id="upB" type="number" inputmode="decimal" placeholder="Enter new amount"></div>
-    <button class="shbtn" onclick="updBal()">Update</button>
+    <button class="shbtn" onclick="updBal()">Update Balance</button>
+    <div class="shf" id="upLF" style="display:none"><label>New Credit Limit</label><input id="upL" type="number" inputmode="decimal" placeholder="Enter new limit"></div>
+    <button id="upLBtn" style="display:none" class="shbtn" onclick="updLim()">Update Limit</button>
     <button class="shdan" onclick="delAcc()">Remove Account</button>
   </div>
 </div>
 
-<script>
-// ─── DATA ──────────────────────────────────────────────
-const CATS = [
-  {id:'necessities', icon:'🛒', name:'Necessities'},
-  {id:'bills',       icon:'🧾', name:'Bills'},
-  {id:'eating-out',  icon:'🍽', name:'Eating Out'},
-  {id:'transport',   icon:'🚃', name:'Transport'},
-  {id:'apparel',     icon:'🛍️', name:'Apparel'},
-  {id:'entertainment',icon:'🎮',name:'Entertainment'},
-  {id:'travel',      icon:'✈️', name:'Travel'},
-  {id:'health',      icon:'💊', name:'Health'},
-  {id:'self-care',   icon:'💆🏻‍♂️', name:'Self Care'},
-  {id:'gifts',       icon:'🎁', name:'Gifts'},
-  {id:'others',      icon:'📦', name:'Others'},
-];
-
-const INC_SOURCES = [
-  {id:'remittance',  icon:'💸', name:'Remittance'},
-  {id:'scholarship', icon:'🎓', name:'Scholarship'},
-  {id:'parttime',    icon:'💼', name:'Part-time Job'},
-  {id:'others',      icon:'📦', name:'Others'},
-];
-
-const MN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const MS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-function ls(k){ try{ return JSON.parse(localStorage.getItem('kb5_'+k)); } catch{ return null; } }
-function sv(k,v){ localStorage.setItem('kb5_'+k, JSON.stringify(v)); }
-
-const S = {
-  cur: 'JPY',
-  mode: 'expense',
-  sel: null,
-  cY: new Date().getFullYear(),
-  cM: new Date().getMonth(),
-  cSel: null,
-  eAccId: null,
-  cfg:  ls('cfg') || {},
-  exp:  ls('exp') || [],
-  inc:  ls('inc') || [],
-  acc:  ls('acc') || [],
-};
-
-// ─── INIT ──────────────────────────────────────────────
-function init() {
-  renderPills();
-  renderRecent();
-  applyMode();
-  renderCal();
-  renderAcc();
-  loadCfg();
-  renderPropLists();
-  if (!S.cfg.apiKey || !S.cfg.txDbId) {
-    document.getElementById('setupBanner').style.display = 'flex';
-  }
-}
-
-// ─── NAV ───────────────────────────────────────────────
-function goTab(id, btn) {
-  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
-  document.querySelectorAll('.tb').forEach(b => b.classList.remove('on'));
-  document.getElementById('s-'+id).classList.add('on');
-  btn.classList.add('on');
-  if (id === 'cal') renderCal();
-  if (id === 'acc') renderAcc();
-}
-
-// ─── CURRENCY ──────────────────────────────────────────
-function setCur(c) {
-  S.cur = c;
-  const j = c === 'JPY';
-  document.getElementById('bjpy').className = 'cbtn' + (j ? ' aj' : '');
-  document.getElementById('bphp').className = 'cbtn' + (!j ? ' ap' : '');
-  document.getElementById('aSym').textContent = j ? '¥' : '₱';
-}
-
-// ─── MODE ──────────────────────────────────────────────
-function setMode(m) {
-  S.mode = m;
-  S.sel = null;
-  applyMode();
-  renderPills();
-}
-
-function applyMode() {
-  const isInc = S.mode === 'income';
-  document.getElementById('btn-exp').className = 'ttbtn' + (!isInc ? ' ae' : '');
-  document.getElementById('btn-inc').className = 'ttbtn' + (isInc ? ' ai' : '');
-  const accent = isInc ? 'var(--inc)' : 'var(--exp)';
-  const accentd = isInc ? 'var(--incd)' : 'var(--expd)';
-  document.documentElement.style.setProperty('--accent', accent);
-  document.documentElement.style.setProperty('--accentd', accentd);
-  document.getElementById('aSym').style.color = accent;
-  const btn = document.getElementById('subBtn');
-  btn.textContent = isInc ? 'Log Income' : 'Log Expense';
-  btn.className = 'btn' + (isInc ? ' inc' : '');
-  document.getElementById('pillLabel').textContent = isInc ? 'Source' : 'Category';
-  document.getElementById('nInp').placeholder = isInc ? 'Add a note (optional)' : 'What was this for?';
-}
-
-// ─── PILLS ─────────────────────────────────────────────
-function renderPills() {
-  const items = S.mode === 'income' ? INC_SOURCES : CATS;
-  document.getElementById('pillScroll').innerHTML = items.map(item =>
-    `<div class="pill${S.sel===item.id?' on':''}" id="pill-${item.id}" onclick="selPill('${item.id}')">
-      <span>${item.icon}</span><span>${item.name}</span>
-    </div>`
-  ).join('');
-}
-
-function selPill(id) {
-  S.sel = id;
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
-  const el = document.getElementById('pill-'+id);
-  if (el) el.classList.add('on');
-}
-
-// ─── SUBMIT ────────────────────────────────────────────
-function subMain() {
-  if (S.mode === 'income') subInc();
-  else subExp();
-}
-
-async function subExp() {
-  const amt = parseFloat(document.getElementById('aInp').value);
-  const note = document.getElementById('nInp').value.trim();
-  if (!amt || amt <= 0) { toast('Enter an amount', true); return; }
-  if (!S.sel) { toast('Pick a category', true); return; }
-  const cat = CATS.find(c => c.id === S.sel);
-  const tx = { id: Date.now(), amt, cur: S.cur, catId: S.sel, catName: cat.name, catIcon: cat.icon, note, time: new Date().toISOString(), type: 'expense' };
-  setLoad(true);
-  S.exp.unshift(tx); if (S.exp.length > 1000) S.exp = S.exp.slice(0,1000);
-  sv('exp', S.exp);
-  if (S.cfg.apiKey && S.cfg.txDbId) {
-    try { await nSaveTx(tx); toast(cat.icon + ' Saved to Notion'); }
-    catch(e) { toast(e.message, true); }
-  } else toast(cat.icon + ' Saved locally');
-  document.getElementById('aInp').value = '';
-  document.getElementById('nInp').value = '';
-  S.sel = null;
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
-  setLoad(false);
-  renderRecent();
-}
-
-async function subInc() {
-  const amt = parseFloat(document.getElementById('aInp').value);
-  const note = document.getElementById('nInp').value.trim();
-  if (!amt || amt <= 0) { toast('Enter an amount', true); return; }
-  if (!S.sel) { toast('Pick a source', true); return; }
-  const src = INC_SOURCES.find(s => s.id === S.sel);
-  const tx = { id: Date.now(), amt, cur: S.cur, catId: S.sel, catName: src.name, catIcon: src.icon, note, time: new Date().toISOString(), type: 'income' };
-  setLoad(true);
-  S.inc.unshift(tx); if (S.inc.length > 1000) S.inc = S.inc.slice(0,1000);
-  sv('inc', S.inc);
-  if (S.cfg.apiKey && S.cfg.txDbId) {
-    try { await nSaveTx(tx); toast(src.icon + ' Saved to Notion'); }
-    catch(e) { toast(e.message, true); }
-  } else toast(src.icon + ' Saved locally');
-  document.getElementById('aInp').value = '';
-  document.getElementById('nInp').value = '';
-  S.sel = null;
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
-  setLoad(false);
-  renderRecent();
-}
-
-function setLoad(on) {
-  const b = document.getElementById('subBtn');
-  b.disabled = on;
-  b.textContent = on ? 'Saving…' : (S.mode === 'income' ? 'Log Income' : 'Log Expense');
-}
-
-// ─── RECENT LIST ───────────────────────────────────────
-function renderRecent() {
-  const list = document.getElementById('recList');
-  const all = [
-    ...S.exp.map(e => ({...e, _t:'e'})),
-    ...S.inc.map(i => ({...i, _t:'i'}))
-  ].sort((a,b) => new Date(b.time) - new Date(a.time)).slice(0, 20);
-
-  if (!all.length) {
-    list.innerHTML = `<div class="empty"><div class="ei">🗒</div><div class="et">Nothing logged yet</div></div>`;
-    return;
-  }
-  list.innerHTML = all.map(tx => {
-    const sym = tx.cur === 'JPY' ? '¥' : '₱';
-    const amt = fmtN(tx.amt, tx.cur);
-    const d = new Date(tx.time);
-    const time = isToday(d)
-      ? d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})
-      : MS[d.getMonth()] + ' ' + d.getDate();
-    const pfx = tx._t === 'i' ? '+' : '-';
-    return `<div class="li">
-      <div class="lic">${tx.catIcon}</div>
-      <div class="lim">
-        <div class="lit">${tx.catName}</div>
-        ${tx.note ? `<div class="lis">${tx.note}</div>` : ''}
-      </div>
-      <div class="lir">
-        <div class="lia ${tx._t}">${pfx}${sym}${amt}</div>
-        <div class="litime">${time}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ─── CALENDAR ──────────────────────────────────────────
-function renderCal() {
-  const {cY:y, cM:m} = S;
-  document.getElementById('cLabel').textContent = MN[m] + ' ' + y;
-  const first = new Date(y,m,1).getDay();
-  const days  = new Date(y,m+1,0).getDate();
-  const prev  = new Date(y,m,0).getDate();
-  const today = new Date();
-  const em = {}, im = {};
-  S.exp.forEach(e => { const d = new Date(e.time); if(d.getFullYear()===y&&d.getMonth()===m){const k=d.getDate();if(!em[k])em[k]=[];em[k].push(e);} });
-  S.inc.forEach(i => { const d = new Date(i.time); if(d.getFullYear()===y&&d.getMonth()===m){const k=d.getDate();if(!im[k])im[k]=[];im[k].push(i);} });
-  let h = '';
-  for (let i=first-1; i>=0; i--) h += `<div class="cday other"><span class="cdn">${prev-i}</span></div>`;
-  for (let d=1; d<=days; d++) {
-    const td = d===today.getDate()&&m===today.getMonth()&&y===today.getFullYear();
-    const sl = S.cSel===d;
-    const he = em[d]?.length>0, hi = im[d]?.length>0;
-    h += `<div class="cday${td?' today':''}${sl?' sel':''}" onclick="selCal(${d})">
-      <span class="cdn">${d}</span>
-      ${he?'<div class="cdot e"></div>':''}
-      ${hi?`<div class="cdot i" style="${he?'right:6px':''}"></div>`:''}
-    </div>`;
-  }
-  const rem = (first+days)%7===0 ? 0 : 7-(first+days)%7;
-  for (let i=1; i<=rem; i++) h += `<div class="cday other"><span class="cdn">${i}</span></div>`;
-  document.getElementById('cDays').innerHTML = h;
-  renderCalDetail(em, im);
-}
-
-function selCal(d) { S.cSel = S.cSel===d ? null : d; renderCal(); }
-function calPrev() { S.cM===0?(S.cM=11,S.cY--):S.cM--; S.cSel=null; renderCal(); }
-function calNext() { S.cM===11?(S.cM=0,S.cY++):S.cM++; S.cSel=null; renderCal(); }
-
-function renderCalDetail(em, im) {
-  const d = S.cSel;
-  const el = document.getElementById('cDetail');
-  if (!d) { el.innerHTML=''; return; }
-  const ex = em[d]||[], inc = im[d]||[];
-  if (!ex.length && !inc.length) { el.innerHTML=''; return; }
-  const et = ex.reduce((s,e)=>s+e.amt,0), it = inc.reduce((s,i)=>s+i.amt,0), net = it-et;
-  const cur = ex[0]?.cur || inc[0]?.cur || 'JPY';
-  const sym = cur==='JPY'?'¥':'₱';
-  el.innerHTML = `<div class="csum">
-    <div class="csumh">
-      <div class="csumd">${MS[S.cM]} ${d}</div>
-      <div class="csumt${net>=0?' pos':''}">${net>=0?'+':''}${sym}${fmtN(Math.abs(net),cur)}</div>
-    </div>
-    <div class="csuml">
-      ${inc.map(i=>`<div class="crow"><div class="cri">${i.catIcon}</div><div class="crn">${i.catName}${i.note?' · '+i.note:''}</div><div class="cra" style="color:var(--inc)">+${i.cur==='JPY'?'¥':'₱'}${fmtN(i.amt,i.cur)}</div></div>`).join('')}
-      ${ex.map(e=>`<div class="crow"><div class="cri">${e.catIcon}</div><div class="crn">${e.catName}${e.note?' · '+e.note:''}</div><div class="cra" style="color:var(--exp)">-${e.cur==='JPY'?'¥':'₱'}${fmtN(e.amt,e.cur)}</div></div>`).join('')}
-    </div>
-  </div>`;
-}
-
-// ─── ACCOUNTS ──────────────────────────────────────────
-function renderAcc() {
-  const banks = S.acc.filter(a => a.type !== 'credit');
-  const cards = S.acc.filter(a => a.type === 'credit');
-  const noMsg = `<div class="empty" style="padding:12px 0"><div class="et">None added yet</div></div>`;
-  document.getElementById('bankList').innerHTML = banks.length ? banks.map(accCard).join('') : noMsg;
-  document.getElementById('cardList').innerHTML = cards.length ? cards.map(accCard).join('') : noMsg;
-
-  const jBal = S.acc.filter(a=>a.cur==='JPY').reduce((s,a)=>s+netBal(a),0);
-  const pBal = S.acc.filter(a=>a.cur==='PHP').reduce((s,a)=>s+netBal(a),0);
-  const parts = [];
-  if (S.acc.some(a=>a.cur==='JPY')) parts.push({v:'¥'+fmtN(jBal,'JPY'),l:'JPY',c:jBal>=0?'gi':'ge'});
-  if (S.acc.some(a=>a.cur==='PHP')) parts.push({v:'₱'+fmtN(pBal,'PHP'),l:'PHP',c:pBal>=0?'gi':'ge'});
-  document.getElementById('nwAmt').textContent = parts[0]?.v || '—';
-  document.getElementById('nwSubs').innerHTML = parts.map(p=>`<div><div class="nwsv ${p.c}">${p.v}</div><div class="nwsl">${p.l}</div></div>`).join('');
-}
-
-function netBal(a) { return a.type==='credit' ? (a.limit||0)-(a.used||0) : (a.balance||0); }
-
-function accCard(a) {
-  const sym = a.cur==='JPY'?'¥':'₱';
-  const ic = a.type==='credit';
-  const bal = netBal(a);
-  const ico = ic?'💳':a.type==='cash'?'👛':a.cur==='JPY'?'🏦':'🏧';
-  return `<div class="acard2" onclick="openAccDet('${a.id}')">
-    <div class="aico ${ic?'cc':a.type==='cash'?'cs':'bk'}">${ico}</div>
-    <div class="ainf"><div class="an">${a.name}</div><div class="as2">${a.cur} · ${ic?'Credit Card':a.type==='cash'?'Cash':'Bank'}</div></div>
-    <div class="ar"><div class="ab ${a.cur.toLowerCase()}">${sym}${fmtN(bal,a.cur)}</div><div class="atl">${ic?'Available':'Balance'}</div></div>
-  </div>`;
-}
-
-function toggleCF() {
-  const t = document.getElementById('acT').value;
-  document.getElementById('acLF').style.display = t==='credit'?'block':'none';
-  document.getElementById('acBL').textContent = t==='credit'?'Current Available Credit':'Current Balance';
-}
-
-async function saveAcc() {
-  const name = document.getElementById('acN').value.trim();
-  if (!name) { toast('Enter a name', true); return; }
-  const type = document.getElementById('acT').value;
-  const cur  = document.getElementById('acC').value;
-  const bal  = parseFloat(document.getElementById('acB').value) || 0;
-  const lim  = parseFloat(document.getElementById('acL').value) || 0;
-  const a = { id:'a'+Date.now(), name, type, cur, balance: bal, limit: type==='credit'?lim:0, used: type==='credit'?Math.max(0,lim-bal):0 };
-  S.acc.push(a); sv('acc', S.acc);
-  if (S.cfg.apiKey && S.cfg.accDbId) {
-    try { await nSaveAcc(a); } catch(e) { console.error('Acc sync:', e.message); }
-  }
-  cSheet('sh-add-acc');
-  document.getElementById('acN').value = '';
-  document.getElementById('acB').value = '';
-  document.getElementById('acL').value = '';
-  renderAcc(); toast('Account added');
-}
-
-function openAccDet(id) {
-  const a = S.acc.find(x => x.id===id);
-  if (!a) return;
-  S.eAccId = id;
-  const sym = a.cur==='JPY'?'¥':'₱';
-  const ic = a.type==='credit';
-  const avail = netBal(a);
-  document.getElementById('detName').textContent = a.name;
-  document.getElementById('upBL').textContent = ic?'New Available Credit':'New Balance';
-  document.getElementById('upB').value = '';
-  document.getElementById('detGrid').innerHTML = `
-    <div style="background:var(--sf2);border-radius:var(--rs);padding:12px">
-      <div class="sl" style="margin-bottom:4px">${ic?'Available':'Balance'}</div>
-      <div style="font-size:18px;font-weight:700;color:var(--${a.cur.toLowerCase()})">${sym}${fmtN(avail,a.cur)}</div>
-    </div>
-    <div style="background:var(--sf2);border-radius:var(--rs);padding:12px">
-      <div class="sl" style="margin-bottom:4px">${ic?'Limit':'Currency'}</div>
-      <div style="font-size:18px;font-weight:700">${ic?sym+fmtN(a.limit||0,a.cur):a.cur}</div>
-    </div>`;
-  if (ic) {
-    const used = a.used||0;
-    const pct = (a.limit||0)>0 ? Math.min(100,(used/(a.limit||1))*100) : 0;
-    document.getElementById('crBar').style.display='block';
-    document.getElementById('crFill').style.width=pct+'%';
-    document.getElementById('crUsed').textContent=`Used: ${sym}${fmtN(used,a.cur)}`;
-    document.getElementById('crLim').textContent=`Limit: ${sym}${fmtN(a.limit||0,a.cur)}`;
-  } else document.getElementById('crBar').style.display='none';
-  oSheet('sh-acc-det');
-}
-
-async function updBal() {
-  const a = S.acc.find(x => x.id===S.eAccId);
-  if (!a) return;
-  const v = parseFloat(document.getElementById('upB').value);
-  if (isNaN(v)) { toast('Enter a valid amount', true); return; }
-  if (a.type==='credit') a.used = Math.max(0,(a.limit||0)-v);
-  else a.balance = v;
-  sv('acc', S.acc);
-  if (S.cfg.apiKey && S.cfg.accDbId && a.notionId) {
-    try { await nPatchAcc(a); } catch(e) { console.error(e); }
-  }
-  cSheet('sh-acc-det'); renderAcc(); toast('Balance updated');
-}
-
-function delAcc() {
-  S.acc = S.acc.filter(x => x.id!==S.eAccId);
-  sv('acc', S.acc); cSheet('sh-acc-det'); renderAcc(); toast('Account removed');
-}
-
-// ─── NOTION API ────────────────────────────────────────
-const PROXY = 'https://corsproxy.io/?url=';
-
-async function nPost(url, body) {
-  const res = await fetch(PROXY + encodeURIComponent(url), {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${S.cfg.apiKey}`, 'Content-Type': 'application/json', 'Notion-Version': '2022-06-28', 'x-requested-with': 'XMLHttpRequest' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) { const e = await res.json(); throw new Error(e.message || 'HTTP '+res.status); }
-  return res.json();
-}
-
-async function nPatch(url, body) {
-  const res = await fetch(PROXY + encodeURIComponent(url), {
-    method: 'PATCH',
-    headers: { 'Authorization': `Bearer ${S.cfg.apiKey}`, 'Content-Type': 'application/json', 'Notion-Version': '2022-06-28', 'x-requested-with': 'XMLHttpRequest' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) { const e = await res.json(); throw new Error(e.message || 'HTTP '+res.status); }
-  return res.json();
-}
-
-async function nSaveTx(tx) {
-  await nPost('https://api.notion.com/v1/pages', {
-    parent: { database_id: S.cfg.txDbId },
-    properties: {
-      "Name":     { title: [{ text: { content: tx.catName + (tx.note ? ' — '+tx.note : '') } }] },
-      "Amount":   { number: tx.amt },
-      "Currency": { select: { name: tx.cur } },
-      "Category": { select: { name: tx.catName } },
-      "Note":     { rich_text: [{ text: { content: tx.note || '' } }] },
-      "Date":     { date: { start: tx.time } },
-      "Type":     { select: { name: tx.type } },
-    }
-  });
-}
-
-async function nSaveAcc(a) {
-  const res = await nPost('https://api.notion.com/v1/pages', {
-    parent: { database_id: S.cfg.accDbId },
-    properties: {
-      "Name":     { title: [{ text: { content: a.name } }] },
-      "Type":     { select: { name: a.type } },
-      "Currency": { select: { name: a.cur } },
-      "Balance":  { number: a.balance || 0 },
-      "Limit":    { number: a.limit || 0 },
-      "Used":     { number: a.used || 0 },
-    }
-  });
-  // store notion page id for future updates
-  if (res.id) {
-    a.notionId = res.id;
-    sv('acc', S.acc);
-  }
-}
-
-async function nPatchAcc(a) {
-  await nPatch(`https://api.notion.com/v1/pages/${a.notionId}`, {
-    properties: {
-      "Balance": { number: a.balance || 0 },
-      "Used":    { number: a.used || 0 },
-    }
-  });
-}
-
-async function testConn() {
-  const k = document.getElementById('cfgK').value.trim();
-  const txId = document.getElementById('cfgTx').value.trim();
-  const accId = document.getElementById('cfgAc').value.trim();
-  const el = document.getElementById('testResult');
-  el.style.display = 'block'; el.style.color = 'var(--t2)'; el.textContent = 'Testing…';
-  if (!k) { el.textContent = 'Enter your API key first.'; return; }
-  const PROXY = 'https://corsproxy.io/?url=';
-  const testDb = async (dbId, label) => {
-    if (!dbId) return label + ': (skipped)';
-    try {
-      const res = await fetch(PROXY + encodeURIComponent('https://api.notion.com/v1/databases/' + dbId), {
-        headers: { 'Authorization': 'Bearer ' + k, 'Notion-Version': '2022-06-28', 'x-requested-with': 'XMLHttpRequest' }
-      });
-      const data = await res.json();
-      if (res.ok) {
-        const props = Object.keys(data.properties || {}).join(', ');
-        return '✓ ' + label + ': "' + (data.title?.[0]?.plain_text || 'Untitled') + '"\nProps: ' + props;
-      } else {
-        return '✗ ' + label + ': ' + data.code + ' — ' + data.message;
-      }
-    } catch(e) { return '✗ ' + label + ': ' + e.message; }
-  };
-  const results = await Promise.all([testDb(txId, 'Transactions DB'), testDb(accId, 'Accounts DB')]);
-  el.style.color = 'var(--t2)';
-  el.textContent = results.join('\n\n');
-}
-
-// ─── CONFIG ────────────────────────────────────────────
-function loadCfg() {
-  const c = S.cfg;
-  if (c.apiKey)  document.getElementById('cfgK').value   = c.apiKey;
-  if (c.txDbId)  document.getElementById('cfgTx').value  = c.txDbId;
-  if (c.accDbId) document.getElementById('cfgAc').value  = c.accDbId;
-  if (c.base)    document.getElementById('cfgBase').value = c.base;
-}
-
-function saveCfg() {
-  S.cfg = {
-    apiKey:  document.getElementById('cfgK').value.trim(),
-    txDbId:  document.getElementById('cfgTx').value.trim(),
-    accDbId: document.getElementById('cfgAc').value.trim(),
-    base:    document.getElementById('cfgBase').value,
-  };
-  sv('cfg', S.cfg);
-  cSheet('sh-cfg');
-  document.getElementById('setupBanner').style.display = (S.cfg.apiKey && S.cfg.txDbId) ? 'none' : 'flex';
-  toast('Settings saved');
-}
-
-function renderPropLists() {
-  const txProps = [
-    ['Name','title'],['Amount','number'],['Currency','select'],
-    ['Category','select'],['Note','text'],['Date','date'],['Type','select'],
-  ];
-  const acProps = [
-    ['Name','title'],['Type','select'],['Currency','select'],
-    ['Balance','number'],['Limit','number'],['Used','number'],
-  ];
-  const render = (props) => props.map(([n,t]) =>
-    `<div class="prop-row"><span style="font-weight:600;color:var(--t)">${n}</span><span style="color:var(--t2);font-size:11px">${t}</span></div>`
-  ).join('');
-  document.getElementById('propsTx').innerHTML = render(txProps);
-  document.getElementById('propsAc').innerHTML = render(acProps);
-}
-
-// ─── SHEETS ────────────────────────────────────────────
-function oSheet(id) { document.getElementById(id).classList.add('on'); }
-function cSheet(id) { document.getElementById(id).classList.remove('on'); }
-function overlayClick(e, id) { if (e.target===document.getElementById(id)) cSheet(id); }
-
-// ─── TOAST ─────────────────────────────────────────────
-let _tt;
-function toast(msg, err=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (err?' err':'') + ' on';
-  clearTimeout(_tt);
-  _tt = setTimeout(() => t.classList.remove('on'), 2600);
-}
-
-// ─── HELPERS ───────────────────────────────────────────
-function fmtN(n, cur) {
-  if (cur==='JPY') return Math.round(n||0).toLocaleString();
-  return (n||0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-}
-function isToday(d) {
-  const n = new Date();
-  return d.getDate()===n.getDate() && d.getMonth()===n.getMonth() && d.getFullYear()===n.getFullYear();
-}
-
-init();
-</script>
+<script src="kakeibo.js"></script>
 </body>
 </html>
