@@ -293,7 +293,7 @@ async function saveEditDate() {
   tx.time = orig.toISOString();
   if (S._editDateKey === 'inc') sv('inc', S.inc); else sv('exp', S.exp);
   if (S.cfg.apiKey && S.cfg.txDbId) {
-    try { await nSaveTx(tx); } catch(e) { console.error('Date sync:', e.message); }
+    try { await nPatchTxDate(tx); } catch(e) { console.error('Date sync:', e.message); }
   }
   cSheet('sh-edit-date');
   renderCal();
@@ -479,8 +479,15 @@ async function nPatch(url, body) {
   return res.json();
 }
 
+function txDateStr(isoTime) {
+  const d = new Date(isoTime);
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
 async function nSaveTx(tx) {
-  await nPost('https://api.notion.com/v1/pages', {
+  const res = await nPost('https://api.notion.com/v1/pages', {
     parent: { database_id: S.cfg.txDbId },
     properties: {
       "Name":     { title: [{ text: { content: tx.catName + (tx.note ? ' — '+tx.note : '') } }] },
@@ -488,8 +495,22 @@ async function nSaveTx(tx) {
       "Currency": { select: { name: tx.cur } },
       "Category": { select: { name: tx.catName } },
       "Note":     { rich_text: [{ text: { content: tx.note || '' } }] },
-      "Date":     { date: { start: tx.time } },
+      "Date":     { date: { start: txDateStr(tx.time) } },
       "Type":     { select: { name: tx.type } },
+    }
+  });
+  if (res.id) {
+    tx.notionPageId = res.id;
+    const key = tx.type === 'income' ? 'inc' : 'exp';
+    sv(key, S[key]);
+  }
+}
+
+async function nPatchTxDate(tx) {
+  if (!tx.notionPageId) { await nSaveTx(tx); return; }
+  await nPatch(`https://api.notion.com/v1/pages/${tx.notionPageId}`, {
+    properties: {
+      "Date": { date: { start: txDateStr(tx.time) } },
     }
   });
 }
