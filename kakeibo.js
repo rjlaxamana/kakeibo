@@ -10,14 +10,16 @@ const CATS = [
   {id:'health',      icon:'💊', name:'Health'},
   {id:'self-care',   icon:'💆🏻‍♂️', name:'Self Care'},
   {id:'gifts',       icon:'🎁', name:'Gifts'},
+  {id:'investments', icon:'📈', name:'Investments'},
   {id:'others',      icon:'📦', name:'Others'},
 ];
 
 const INC_SOURCES = [
-  {id:'remittance',  icon:'💸', name:'Remittance'},
-  {id:'scholarship', icon:'🎓', name:'Scholarship'},
-  {id:'parttime',    icon:'💼', name:'Part-time Job'},
-  {id:'others',      icon:'📦', name:'Others'},
+  {id:'remittance',     icon:'💸', name:'Remittance'},
+  {id:'scholarship',    icon:'🎓', name:'Scholarship'},
+  {id:'reimbursement', icon'⏮️',  name'Reimbursement'},
+  {id:'baito',          icon:'💼', name:'Baito'},
+  {id:'others',         icon:'📦', name:'Others'},
 ];
 
 const MN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
