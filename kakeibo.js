@@ -17,7 +17,7 @@ const CATS = [
 const INC_SOURCES = [
   {id:'remittance',     icon:'💸', name:'Remittance'},
   {id:'scholarship',    icon:'🎓', name:'Scholarship'},
-  {id:'reimbursement', icon'⏮️',  name'Reimbursement'},
+  {id:'reimbursement',  icon:'⏮️', name:'Reimbursement'},
   {id:'baito',          icon:'💼', name:'Baito'},
   {id:'others',         icon:'📦', name:'Others'},
 ];
