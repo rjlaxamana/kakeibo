@@ -47,7 +47,6 @@ function init() {
   renderPills();
   renderRecent();
   applyMode();
-  renderCal();
   renderAcc();
   loadCfg();
   renderPropLists();
@@ -60,13 +59,27 @@ function init() {
 }
 
 // ─── NAV ───────────────────────────────────────────────
+let _analLoaded = false;
+
 function goTab(id, btn) {
   document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
   document.querySelectorAll('.tb').forEach(b => b.classList.remove('on'));
   document.getElementById('s-'+id).classList.add('on');
   btn.classList.add('on');
-  if (id === 'cal') renderCal();
+  if (id === 'anal') {
+    if (!_analLoaded) {
+      _analLoaded = true;
+      renderAnalysis();
+    }
+  }
   if (id === 'acc') renderAcc();
+}
+
+function refreshAnalysis() {
+  AN.txCache = null;
+  _analLoaded = false;
+  renderAnalysis();
+  _analLoaded = true;
 }
 
 // ─── CURRENCY ──────────────────────────────────────────
@@ -145,6 +158,8 @@ async function subExp() {
   document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
   setLoad(false);
   renderRecent();
+  // Invalidate analysis cache so next visit refreshes
+  AN.txCache = null; _analLoaded = false;
 }
 
 async function subInc() {
@@ -167,6 +182,7 @@ async function subInc() {
   document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
   setLoad(false);
   renderRecent();
+  AN.txCache = null; _analLoaded = false;
 }
 
 function setLoad(on) {
@@ -209,41 +225,8 @@ function renderRecent() {
   }).join('');
 }
 
-// ─── CALENDAR ──────────────────────────────────────────
-function renderCal() {
-  const {cY:y, cM:m} = S;
-  document.getElementById('cLabel').textContent = MN[m] + ' ' + y;
-  const first = new Date(y,m,1).getDay();
-  const days  = new Date(y,m+1,0).getDate();
-  const prev  = new Date(y,m,0).getDate();
-  const today = new Date();
-  const em = {}, im = {};
-  S.exp.forEach(e => { const d = new Date(e.time); if(d.getFullYear()===y&&d.getMonth()===m){const k=d.getDate();if(!em[k])em[k]=[];em[k].push(e);} });
-  S.inc.forEach(i => { const d = new Date(i.time); if(d.getFullYear()===y&&d.getMonth()===m){const k=d.getDate();if(!im[k])im[k]=[];im[k].push(i);} });
-  let h = '';
-  for (let i=first-1; i>=0; i--) h += `<div class="cday other"><span class="cdn">${prev-i}</span></div>`;
-  for (let d=1; d<=days; d++) {
-    const td = d===today.getDate()&&m===today.getMonth()&&y===today.getFullYear();
-    const sl = S.cSel===d;
-    const he = em[d]?.length>0, hi = im[d]?.length>0;
-    h += `<div class="cday${td?' today':''}${sl?' sel':''}" onclick="selCal(${d})">
-      <span class="cdn">${d}</span>
-      ${he?'<div class="cdot e"></div>':''}
-      ${hi?`<div class="cdot i" style="${he?'right:6px':''}"></div>`:''}
-    </div>`;
-  }
-  const rem = (first+days)%7===0 ? 0 : 7-(first+days)%7;
-  for (let i=1; i<=rem; i++) h += `<div class="cday other"><span class="cdn">${i}</span></div>`;
-  document.getElementById('cDays').innerHTML = h;
-  renderCalDetail(em, im);
-}
-
-function selCal(d) { S.cSel = S.cSel===d ? null : d; renderCal(); }
-function calPrev() { S.cM===0?(S.cM=11,S.cY--):S.cM--; S.cSel=null; renderCal(); }
-function calNext() { S.cM===11?(S.cM=0,S.cY++):S.cM++; S.cSel=null; renderCal(); }
-
-// ─── EDIT DATE PICKER ──────────────────────────────────
-const ED = { y: 0, m: 0, d: 0 }; // currently selected date in picker
+// ─── EDIT DATE PICKER (retained for home screen use) ───
+const ED = { y: 0, m: 0, d: 0 };
 
 function renderEdCal() {
   document.getElementById('edCalLabel').textContent = MN[ED.m] + ' ' + ED.y;
@@ -255,9 +238,9 @@ function renderEdCal() {
   for (let i = first - 1; i >= 0; i--)
     h += `<div class="cday other"><span class="cdn">${prev - i}</span></div>`;
   for (let d = 1; d <= days; d++) {
-    const isToday = d === today.getDate() && ED.m === today.getMonth() && ED.y === today.getFullYear();
-    const isSel   = d === ED.d;
-    h += `<div class="cday${isToday ? ' today' : ''}${isSel ? ' sel' : ''}" onclick="edCalSel(${d})">
+    const isT = d === today.getDate() && ED.m === today.getMonth() && ED.y === today.getFullYear();
+    const isSel = d === ED.d;
+    h += `<div class="cday${isT ? ' today' : ''}${isSel ? ' sel' : ''}" onclick="edCalSel(${d})">
       <span class="cdn">${d}</span>
     </div>`;
   }
@@ -298,30 +281,9 @@ async function saveEditDate() {
     try { await nPatchTxDate(tx); } catch(e) { console.error('Date sync:', e.message); }
   }
   cSheet('sh-edit-date');
-  renderCal();
   renderRecent();
   toast('Date updated');
-}
-
-function renderCalDetail(em, im) {
-  const d = S.cSel;
-  const el = document.getElementById('cDetail');
-  if (!d) { el.innerHTML=''; return; }
-  const ex = em[d]||[], inc = im[d]||[];
-  if (!ex.length && !inc.length) { el.innerHTML=''; return; }
-  const et = ex.reduce((s,e)=>s+e.amt,0), it = inc.reduce((s,i)=>s+i.amt,0), net = it-et;
-  const cur = ex[0]?.cur || inc[0]?.cur || 'JPY';
-  const sym = cur==='JPY'?'¥':'₱';
-  el.innerHTML = `<div class="csum">
-    <div class="csumh">
-      <div class="csumd">${MS[S.cM]} ${d}</div>
-      <div class="csumt${net>=0?' pos':''}">${net>=0?'+':''}${sym}${fmtN(Math.abs(net),cur)}</div>
-    </div>
-    <div class="csuml">
-      ${inc.map(i=>`<div class="crow" onclick="openEditDate('${i.id}','inc')" style="cursor:pointer"><div class="cri">${i.catIcon}</div><div class="crn">${i.catName}${i.note?' · '+i.note:''}</div><div class="cra" style="color:var(--inc)">+${i.cur==='JPY'?'¥':'₱'}${fmtN(i.amt,i.cur)}</div></div>`).join('')}
-      ${ex.map(e=>`<div class="crow" onclick="openEditDate('${e.id}','exp')" style="cursor:pointer"><div class="cri">${e.catIcon}</div><div class="crn">${e.catName}${e.note?' · '+e.note:''}</div><div class="cra" style="color:var(--exp)">-${e.cur==='JPY'?'¥':'₱'}${fmtN(e.amt,e.cur)}</div></div>`).join('')}
-    </div>
-  </div>`;
+  AN.txCache = null; _analLoaded = false;
 }
 
 // ─── ACCOUNTS ──────────────────────────────────────────
@@ -614,6 +576,8 @@ function saveCfg() {
   sv('cfg', S.cfg);
   cSheet('sh-cfg');
   document.getElementById('setupBanner').style.display = (S.cfg.apiKey && S.cfg.txDbId) ? 'none' : 'flex';
+  // Invalidate analysis cache on config change
+  AN.txCache = null; _analLoaded = false;
   toast('Settings saved');
 }
 

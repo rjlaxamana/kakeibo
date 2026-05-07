@@ -50,19 +50,15 @@
   <div class="lw" id="recList"></div>
 </div>
 
-<!-- CALENDAR -->
-<div class="scr" id="s-cal">
-  <div class="ph"><div class="pht">Calendar</div></div>
-  <div class="cnav">
-    <div class="carr" onclick="calPrev()">‹</div>
-    <div class="cml" id="cLabel"></div>
-    <div class="carr" onclick="calNext()">›</div>
+<!-- ANALYSIS -->
+<div class="scr" id="s-anal">
+  <div class="ph">
+    <div class="pht">Analysis</div>
+    <div class="ibtn" id="anal-refresh-btn" onclick="refreshAnalysis()" title="Refresh from Notion">↺</div>
   </div>
-  <div class="cgrid">
-    <div class="cdow"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
-    <div class="cdays" id="cDays"></div>
+  <div id="anal-content">
+    <div class="ano-data"><div class="ano-ico">📊</div><div class="ano-txt">Open this tab to load data</div></div>
   </div>
-  <div id="cDetail"></div>
 </div>
 
 <!-- ACCOUNTS -->
@@ -88,7 +84,7 @@
 <!-- TABS -->
 <div class="tabs">
   <button class="tb on" onclick="goTab('home',this)"><div class="ti">🏠</div><div class="tl">Home</div></button>
-  <button class="tb" onclick="goTab('cal',this)"><div class="ti">📅</div><div class="tl">Calendar</div></button>
+  <button class="tb" onclick="goTab('anal',this)"><div class="ti">📊</div><div class="tl">Analysis</div></button>
   <button class="tb" onclick="goTab('acc',this)"><div class="ti">🏦</div><div class="tl">Accounts</div></button>
 </div>
 
@@ -184,5 +180,6 @@
 </div>
 
 <script src="kakeibo.js"></script>
+<script src="analysis.js"></script>
 </body>
 </html>
