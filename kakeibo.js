@@ -36,6 +36,8 @@ const S = {
   cM: new Date().getMonth(),
   cSel: null,
   eAccId: null,
+  eTxId: null,
+  eTxType: null,
   cfg:  ls('cfg') || {},
   exp:  ls('exp') || [],
   inc:  ls('inc') || [],
@@ -211,7 +213,7 @@ function renderRecent() {
       ? d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})
       : MS[d.getMonth()] + ' ' + d.getDate();
     const pfx = tx._t === 'i' ? '+' : '-';
-    return `<div class="li">
+    return `<div class="li" onclick="openEdTx('${tx.id}', '${tx._t}')">
       <div class="lic">${tx.catIcon}</div>
       <div class="lim">
         <div class="lit">${tx.catName}</div>
@@ -223,6 +225,109 @@ function renderRecent() {
       </div>
     </div>`;
   }).join('');
+}
+
+// ─── EDIT TRANSACTION ──────────────────────────────────
+function openEdTx(id, type) {
+  S.eTxId = id;
+  S.eTxType = type;
+  const list = type === 'i' ? S.inc : S.exp;
+  const tx = list.find(x => String(x.id) === String(id));
+  if (!tx) return;
+
+  document.getElementById('etT').value = tx.type || (type === 'i' ? 'income' : 'expense');
+  etTypeChange();
+  document.getElementById('etCat').value = tx.catId;
+  document.getElementById('etA').value = tx.amt;
+  document.getElementById('etC').value = tx.cur;
+  document.getElementById('etN').value = tx.note || '';
+  document.getElementById('etD').value = txDateStr(tx.time);
+  
+  oSheet('sh-edit-tx');
+}
+
+function etTypeChange() {
+  const type = document.getElementById('etT').value;
+  const items = type === 'income' ? INC_SOURCES : CATS;
+  document.getElementById('etCat').innerHTML = items.map(c => 
+    `<option value="${c.id}">${c.icon} ${c.name}</option>`
+  ).join('');
+  document.getElementById('etCatL').textContent = type === 'income' ? 'Source' : 'Category';
+}
+
+async function saveEdTx() {
+  const list = S.eTxType === 'i' ? S.inc : S.exp;
+  const txIndex = list.findIndex(x => String(x.id) === String(S.eTxId));
+  if (txIndex === -1) return;
+  const tx = list[txIndex];
+
+  const newType = document.getElementById('etT').value;
+  const amt = parseFloat(document.getElementById('etA').value);
+  const cur = document.getElementById('etC').value;
+  const catId = document.getElementById('etCat').value;
+  const note = document.getElementById('etN').value.trim();
+  const dateStr = document.getElementById('etD').value;
+
+  if (!amt || amt <= 0) { toast('Enter an amount', true); return; }
+  if (!dateStr) { toast('Pick a date', true); return; }
+
+  const items = newType === 'income' ? INC_SOURCES : CATS;
+  const cat = items.find(c => c.id === catId);
+
+  const origDate = new Date(tx.time);
+  const newDateParts = dateStr.split('-');
+  origDate.setFullYear(newDateParts[0], newDateParts[1]-1, newDateParts[2]);
+
+  const updatedTx = {
+    ...tx,
+    type: newType,
+    amt, cur, catId, catName: cat.name, catIcon: cat.icon, note,
+    time: origDate.toISOString()
+  };
+
+  if (newType !== (tx.type || (S.eTxType === 'i' ? 'income' : 'expense'))) {
+    list.splice(txIndex, 1);
+    const newList = newType === 'income' ? S.inc : S.exp;
+    newList.unshift(updatedTx);
+    newList.sort((a,b) => new Date(b.time) - new Date(a.time));
+  } else {
+    list[txIndex] = updatedTx;
+    list.sort((a,b) => new Date(b.time) - new Date(a.time));
+  }
+
+  sv('inc', S.inc);
+  sv('exp', S.exp);
+
+  if (S.cfg.apiKey && S.cfg.txDbId) {
+    try { await nPatchTxAll(updatedTx); toast('Saved to Notion'); }
+    catch(e) { toast(e.message, true); }
+  } else {
+    toast('Saved locally');
+  }
+
+  cSheet('sh-edit-tx');
+  renderRecent();
+  AN.txCache = null; _analLoaded = false;
+}
+
+async function delTx() {
+  const list = S.eTxType === 'i' ? S.inc : S.exp;
+  const txIndex = list.findIndex(x => String(x.id) === String(S.eTxId));
+  if (txIndex === -1) return;
+  const tx = list[txIndex];
+
+  list.splice(txIndex, 1);
+  if (S.eTxType === 'i') sv('inc', S.inc); else sv('exp', S.exp);
+
+  if (S.cfg.apiKey && tx.notionPageId) {
+    try { await nArchiveTx(tx.notionPageId); }
+    catch(e) { console.error('Del tx:', e.message); }
+  }
+
+  cSheet('sh-edit-tx');
+  renderRecent();
+  toast('Transaction deleted');
+  AN.txCache = null; _analLoaded = false;
 }
 
 // ─── EDIT DATE PICKER (retained for home screen use) ───
@@ -476,6 +581,28 @@ async function nPatchTxDate(tx) {
     properties: {
       "Date": { date: { start: txDateStr(tx.time) } },
     }
+  });
+}
+
+async function nPatchTxAll(tx) {
+  if (!tx.notionPageId) { await nSaveTx(tx); return; }
+  await nPatch(`https://api.notion.com/v1/pages/${tx.notionPageId}`, {
+    properties: {
+      "Name":     { title: [{ text: { content: tx.catName + (tx.note ? ' — '+tx.note : '') } }] },
+      "Amount":   { number: tx.amt },
+      "Currency": { select: { name: tx.cur } },
+      "Category": { select: { name: tx.catName } },
+      "Note":     { rich_text: [{ text: { content: tx.note || '' } }] },
+      "Date":     { date: { start: txDateStr(tx.time) } },
+      "Type":     { select: { name: tx.type } },
+    }
+  });
+}
+
+async function nArchiveTx(notionPageId) {
+  if (!notionPageId) return;
+  await nPatch(`https://api.notion.com/v1/pages/${notionPageId}`, {
+    archived: true
   });
 }
 

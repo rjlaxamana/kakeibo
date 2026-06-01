@@ -91,6 +91,40 @@
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- EDIT TRANSACTION SHEET -->
+<div class="overlay" id="sh-edit-tx" onclick="overlayClick(event,'sh-edit-tx')">
+  <div class="sheet">
+    <div class="shh"></div>
+    <div class="sht">Edit Transaction</div>
+    <div class="shf">
+      <label>Type</label>
+      <select id="etT" onchange="etTypeChange()"><option value="expense">Expense</option><option value="income">Income</option></select>
+    </div>
+    <div class="shf">
+      <label>Amount</label>
+      <input id="etA" type="number" inputmode="decimal">
+    </div>
+    <div class="shf">
+      <label>Currency</label>
+      <select id="etC"><option value="JPY">🇯🇵 JPY</option><option value="PHP">🇵🇭 PHP</option></select>
+    </div>
+    <div class="shf">
+      <label id="etCatL">Category</label>
+      <select id="etCat"></select>
+    </div>
+    <div class="shf">
+      <label>Note</label>
+      <input id="etN" type="text" placeholder="Optional note">
+    </div>
+    <div class="shf">
+      <label>Date</label>
+      <input id="etD" type="date">
+    </div>
+    <button class="shbtn" onclick="saveEdTx()">Save Changes</button>
+    <button class="shdan" onclick="delTx()">Delete Transaction</button>
+  </div>
+</div>
+
 <!-- EDIT DATE SHEET -->
 <div class="overlay" id="sh-edit-date" onclick="overlayClick(event,'sh-edit-date')">
   <div class="sheet">
